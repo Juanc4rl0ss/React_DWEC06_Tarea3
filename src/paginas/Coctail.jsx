@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, Navigate } from 'react-router-dom';
 import Cocktail from '../componentes/Cocktail';
+import Error from './Error';
 
 function Coctail() {
   // Usar useParams para obtener el id del cóctel desde la URL
   const { id } = useParams();
   const [cocktailDetails, setCocktailDetails] = useState(null);
+  const [errorId, setErrorId] = useState(false);
 
   useEffect(() => {
     const getCocktailDetails = async () => {
@@ -26,18 +28,30 @@ function Coctail() {
           });
         } else {
           setCocktailDetails(null);
+          setErrorId(true);
         }
       } catch (error) {
         console.error("Error fetching cocktail details:", error);
+        setErrorId(true);
       }
     };
     getCocktailDetails();
   }, [id]); // Dependencia del efecto: id del cóctel
 
-  if (!cocktailDetails) {
+  if (!cocktailDetails && !errorId) {
     return <p>Loading cocktail details...</p>;
   }
 
+// Si no  existe el id del coctel, te muestra un mensaje de error
+if (errorId) {
+  return (
+    <Error children={"No Disponemos De Ese Cocktail En la Carta.Por favor, elige alguno del menú"}/>
+  )}
+
+  
+  if(!cocktailDetails) {
+    return null;
+  }
   const { name, image, category, info, glass, instructions, ingredients } = cocktailDetails;
 
   return (
